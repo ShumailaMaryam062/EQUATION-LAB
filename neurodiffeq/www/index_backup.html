@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquationLab - Professional ODE Solutions</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --border: #e2e8f0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            color: var(--dark);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            font-size: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Main Content */
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .hero p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.5em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+        
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .input-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        /* Chart */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+        }
+        
+        /* Steps & Formula */
+        .steps-container {
+            background: linear-gradient(135deg, #fef3c7, #fef08a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 5px solid var(--warning);
+        }
+        
+        .steps-container strong {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: var(--dark);
+        }
+        
+        .step {
+            padding: 15px;
+            margin: 12px 0;
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+            line-height: 1.8;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .step strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .formula-container {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 5px solid var(--primary);
+            text-align: center;
+        }
+        
+        .formula-container strong {
+            display: block;
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.1em;
+        }
+        
+        .formula-container code {
+            display: block;
+            font-size: 22px;
+            color: var(--primary-dark);
+            font-weight: 700;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* Alerts */
+        .error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: var(--error);
+            padding: 16px 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--error);
+            display: none;
+            margin: 20px 0;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+        }
+        
+        .error i {
+            margin-right: 10px;
+        }
+        
+        .error.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: var(--success);
+            padding: 16px 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--success);
+            display: none;
+            margin: 20px 0;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        
+        .success i {
+            margin-right: 10px;
+        }
+        
+        .success.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        
+        .results-section h2 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95em;
+        }
+        
+        .result-value {
+            color: var(--dark);
+            font-size: 1em;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            font-size: 0.95em;
+        }
+        
+        footer i {
+            color: var(--secondary);
+            margin: 0 5px;
+        }
+        .examples {
+            background: #f0f7ff;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            margin-top: 15px;
+        }
+        .examples strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .examples div {
+            font-size: 13px;
+            color: #555;
+            margin: 4px 0;
+        }
+        @media (max-width: 900px) {
+            .content { grid-template-columns: 1fr; }
+        }
+        .examples {
+            background: linear-gradient(135deg, #e0f2fe, #cffafe);
+            padding: 18px;
+            border-radius: 10px;
+            border-left: 5px solid var(--primary);
+            margin-top: 20px;
+        }
+        .examples strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+        .examples div {
+            font-size: 13px;
+            color: #1e293b;
+            margin: 6px 0;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <div class="logo">
+                        <i class="fas fa-calculator"></i>
+                        EquationLab
+                    </div>
+                    <div class="tagline">PROFESSIONAL ODE SOLVER</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1>Solve Differential Equations Analytically</h1>
+            <p>Get step-by-step solutions, exact formulas, and beautiful visualizations</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="content">
+            <!-- Input Card -->
+            <div class="card">
+                <h2><i class="fas fa-edit"></i> Enter Your ODE</h2>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-function"></i> Differential Equation</label>
+                    <input type="text" id="equation" value="dx/dt = -x" placeholder="e.g., dx/dt = -x">
+                    <div class="input-hint">Format: dx/dt = expression (e.g., -x, 2x, x+3, -2x-5)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-play"></i> Initial Condition x₀</label>
+                    <input type="number" id="x0" value="1.0" step="0.1">
+                    <div class="input-hint">Value of x at start time</div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-stopwatch"></i> Start Time</label>
+                    <input type="number" id="t_start" value="0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-forward"></i> End Time</label>
+                    <input type="number" id="t_end" value="10" step="0.5">
+                </div>
+                
+                <button onclick="solveDifferentialEquation()">
+                    <i class="fas fa-bolt"></i> Solve Now
+                </button>
+                
+                <div id="error" class="error"></div>
+                <div id="success" class="success"></div>
+                
+                <div class="examples">
+                    <strong><i class="fas fa-book"></i> Example Equations</strong>
+                    <div>• dx/dt = -x</div>
+                    <div>• dx/dt = x</div>
+                    <div>• dx/dt = -2x</div>
+                    <div>• dx/dt = 2x + 3</div>
+                    <div>• dx/dt = 0.5x - 1</div>
+                </div>
+            </div>
+            
+            <!-- Graph Card -->
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Solution Visualization</h2>
+                <div class="chart-container">
+                    <canvas id="solutionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div id="resultsDiv" class="results-section" style="display: none;">
+            <h2><i class="fas fa-check-circle"></i> Solution Details</h2>
+            
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-calculator"></i> Equation</div>
+                <div class="result-value" id="eqDisplay"></div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-dot-circle"></i> Initial Condition</div>
+                <div class="result-value" id="icDisplay"></div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-cogs"></i> Method</div>
+                <div class="result-value" id="methodDisplay"></div>
+            </div>
+            
+            <div id="formulaDiv" class="formula-container" style="display: none;">
+                <strong><i class="fas fa-infinity"></i> Exact Solution Formula</strong>
+                <code id="formulaText"></code>
+            </div>
+            
+            <div id="stepsDiv" class="steps-container" style="display: none;">
+                <strong><i class="fas fa-list-ol"></i> Step-by-Step Solution</strong>
+
+                <div id="stepsList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><i class="fas fa-infinity"></i> EquationLab <i class="fas fa-heart"></i></p>
+            <p style="margin-top: 10px; font-size: 0.85em; opacity: 0.8;">Advanced differential equation solver with analytical solutions and step-by-step explanations</p>
+        </div>
+    </footer>
+
+    <script>
+        let chart = null;
+        
+        // Solver for: dx/dt = kx
+        function solveLinearHomogeneous(k, x0, t_start, t_end) {
+            const tArray = [];
+            const xArray = [];
+            const points = 500;
+            
+            for (let i = 0; i <= points; i++) {
+                const t = t_start + (i / points) * (t_end - t_start);
+                const x = x0 * Math.exp(k * (t - t_start));
+                tArray.push(parseFloat(t.toFixed(3)));
+                xArray.push(parseFloat(x.toFixed(6)));
+            }
+            
+            // Format helper functions for proper display
+            function formatCoeff(coeff) {
+                if (coeff === 1) return '';
+                if (coeff === -1) return '-';
+                return coeff.toString();
+            }
+            
+            function formatTerm(coeff, variable) {
+                const c = formatCoeff(coeff);
+                if (c === '') return variable;
+                if (c === '-') return '-' + variable;
+                return c + variable;
+            }
+            
+            function formatExponent(coeff, variable) {
+                if (coeff === 1) return variable;
+                if (coeff === -1) return '-' + variable;
+                return coeff + variable;
+            }
+            
+            // Build formula text with proper formatting
+            const kExponent = formatExponent(k, 't');
+            let formulaText = '';
+            
+            if (t_start === 0) {
+                if (x0 === 1) {
+                    formulaText = `x(t) = e^(${kExponent})`;
+                } else {
+                    formulaText = `x(t) = ${x0}e^(${kExponent})`;
+                }
+            } else {
+                const kExpTime = formatExponent(k, `(t-${t_start})`);
+                formulaText = `x(t) = ${x0}e^(${kExpTime})`;
+            }
+            
+            // Build steps with proper formatting
+            const steps = [
+                `<strong>Given ODE:</strong> dx/dt = ${formatTerm(k, 'x')} with x(${t_start}) = ${x0}`,
+                `<strong>Step 1: Separate Variables</strong><br/>dx/x = ${formatTerm(k, 'dt')}`,
+                `<strong>Step 2: Integrate Both Sides</strong><br/>∫(1/x)dx = ∫${formatTerm(k, 'dt')}<br/>ln|x| = ${formatExponent(k, 't')} + C`,
+                `<strong>Step 3: Exponentiate</strong><br/>x(t) = Ae^(${kExponent}) where A is a constant`,
+                `<strong>Step 4: Apply Initial Condition</strong><br/>x(${t_start}) = ${x0}<br/>Therefore A = ${x0}`,
+                `<strong style="color: green; font-size: 18px;">✅ FINAL ANSWER:</strong><br/><strong style="font-size: 20px; color: #667eea;">${formulaText}</strong>`
+            ];
+            
+            return { tArray, xArray, formula: formulaText, steps, method: 'Analytical - Linear Homogeneous' };
+        }
+        
+        // Solver for: dx/dt = kx + b
+        function solveLinearNonHomogeneous(k, b, x0, t_start, t_end) {
+            const tArray = [];
+            const xArray = [];
+            const points = 500;
+            
+            const equilibrium = -b / k;
+            
+            for (let i = 0; i <= points; i++) {
+                const t = t_start + (i / points) * (t_end - t_start);
+                const x = equilibrium + (x0 - equilibrium) * Math.exp(k * (t - t_start));
+                tArray.push(parseFloat(t.toFixed(3)));
+                xArray.push(parseFloat(x.toFixed(6)));
+            }
+            
+            // Format with proper coefficient display
+            function formatCoeff(coeff) {
+                if (coeff === 1) return '';
+                if (coeff === -1) return '-';
+                return coeff.toString();
+            }
+            
+            function formatExponent(coeff, variable) {
+                if (coeff === 1) return variable;
+                if (coeff === -1) return '-' + variable;
+                return coeff + variable;
+            }
+            
+            const kExponent = formatExponent(k, `(t-${t_start})`);
+            const bDisplay = b > 0 ? `+ ${b}` : `- ${Math.abs(b)}`;
+            
+            let formulaText = `x(t) = ${equilibrium.toFixed(4)} + (${(x0 - equilibrium).toFixed(4)})e^(${kExponent})`;
+            
+            const steps = [
+                `<strong>Given ODE:</strong> dx/dt = ${formatCoeff(k)}x ${bDisplay} with x(${t_start}) = ${x0}`,
+                `<strong>Step 1: Find Equilibrium Point</strong><br/>Setting dx/dt = 0: ${formatCoeff(k)}x* ${bDisplay} = 0<br/>x* = ${equilibrium.toFixed(4)}`,
+                `<strong>Step 2: Transform to Homogeneous Form</strong><br/>Let y = x - ${equilibrium.toFixed(4)}<br/>Then dy/dt = ${formatCoeff(k)}y`,
+                `<strong>Step 3: Solve Homogeneous ODE</strong><br/>dy/dt = ${formatCoeff(k)}y has solution:<br/>y(t) = Ce^(${kExponent})`,
+                `<strong>Step 4: Apply Initial Condition</strong><br/>y(${t_start}) = x(${t_start}) - x* = ${x0} - ${equilibrium.toFixed(4)} = ${(x0 - equilibrium).toFixed(4)}<br/>So C = ${(x0 - equilibrium).toFixed(4)}`,
+                `<strong style="color: green; font-size: 18px;">✅ FINAL ANSWER:</strong><br/><strong style="font-size: 20px; color: #667eea;">${formulaText}</strong>`
+            ];
+            
+            return { tArray, xArray, formula: formulaText, steps, method: 'Analytical - Linear Non-Homogeneous' };
+        }
+        
+        function parseEquation(equationStr) {
+            // Extract RHS from "dx/dt = ..."
+            const match = equationStr.match(/dx\/dt\s*=\s*(.+)/i);
+            if (!match) throw new Error('Format must be: dx/dt = expression');
+            
+            const rhs = match[1].trim();
+            
+            // Try to match: kx + b or kx - b (non-homogeneous)
+            const nonHomoMatch = rhs.match(/^([\+\-]?\s*[\d\.]*)\s*\*?\s*x\s*([\+\-])\s*([\d\.]+)$/i);
+            if (nonHomoMatch) {
+                let kStr = nonHomoMatch[1].trim();
+                let bSign = nonHomoMatch[2];
+                let bNum = nonHomoMatch[3];
+                
+                let k = (kStr === '' || kStr === '+') ? 1 : (kStr === '-') ? -1 : parseFloat(kStr);
+                let b = bSign === '-' ? -parseFloat(bNum) : parseFloat(bNum);
+                
+                if (isNaN(k)) k = 1;
+                if (isNaN(b)) throw new Error('Invalid constant in equation');
+                
+                return { type: 'linear_non_homogeneous', k, b };
+            }
+            
+            // Try to match: kx (homogeneous)
+            const linMatch = rhs.match(/^([\+\-]?\s*[\d\.]*)\s*\*?\s*x\s*$/i);
+            if (linMatch) {
+                let kStr = linMatch[1].trim();
+                let k = (kStr === '' || kStr === '+') ? 1 : (kStr === '-') ? -1 : parseFloat(kStr);
+                
+                if (isNaN(k)) k = 1;
+                
+                return { type: 'linear_homogeneous', k };
+            }
+            
+            throw new Error(`Cannot solve: ${rhs}`);
+        }
+        
+        function solveDifferentialEquation() {
+            const equationStr = document.getElementById('equation').value.trim();
+            const x0 = parseFloat(document.getElementById('x0').value);
+            const t_start = parseFloat(document.getElementById('t_start').value);
+            const t_end = parseFloat(document.getElementById('t_end').value);
+            
+            // Clear previous errors
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('success').classList.remove('show');
+            
+            try {
+                if (!equationStr) throw new Error('Please enter an equation');
+                if (isNaN(x0)) throw new Error('Initial condition must be a number');
+                if (isNaN(t_start) || isNaN(t_end)) throw new Error('Times must be numbers');
+                if (t_start >= t_end) throw new Error('Start time must be less than end time');
+                
+                const parsed = parseEquation(equationStr);
+                let result;
+                
+                if (parsed.type === 'linear_homogeneous') {
+                    result = solveLinearHomogeneous(parsed.k, x0, t_start, t_end);
+                } else if (parsed.type === 'linear_non_homogeneous') {
+                    result = solveLinearNonHomogeneous(parsed.k, parsed.b, x0, t_start, t_end);
+                }
+                
+                // Display results
+                displayResults(equationStr, x0, t_start, t_end, result);
+                
+                document.getElementById('success').innerHTML = '<i class="fas fa-check-circle"></i> Solution computed successfully!';
+                document.getElementById('success').classList.add('show');
+                
+            } catch (e) {
+                document.getElementById('error').innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + e.message;
+                document.getElementById('error').classList.add('show');
+            }
+        }
+        
+        function displayResults(equationStr, x0, t_start, t_end, result) {
+            const { tArray, xArray, formula, steps, method } = result;
+            
+            // Display info
+            document.getElementById('eqDisplay').textContent = equationStr;
+            document.getElementById('icDisplay').textContent = `x(${t_start}) = ${x0}`;
+            document.getElementById('methodDisplay').textContent = method;
+            
+            // Display formula
+            document.getElementById('formulaText').textContent = formula;
+            document.getElementById('formulaDiv').style.display = 'block';
+            
+            // Display steps with HTML
+            let stepsHTML = '';
+            steps.forEach((step, idx) => {
+                stepsHTML += `<div class="step">${step}</div>`;
+            });
+            document.getElementById('stepsList').innerHTML = stepsHTML;
+            document.getElementById('stepsDiv').style.display = 'block';
+            
+            // Create/Update chart
+            const ctx = document.getElementById('solutionChart').getContext('2d');
+            
+            if (chart) {
+                chart.data.labels = tArray;
+                chart.data.datasets[0].data = xArray;
+                chart.update();
+            } else {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: tArray,
+                        datasets: [{
+                            label: 'x(t)',
+                            data: xArray,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102,126,234,0.1)',
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { font: { size: 12 } } }
+                        },
+                        scales: {
+                            y: { title: { display: true, text: 'x(t)' } },
+                            x: { title: { display: true, text: 't' } }
+                        }
+                    }
+                });
+            }
+            
+            document.getElementById('resultsDiv').style.display = 'block';
+        }
+        
+        // Allow Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') solveDifferentialEquation();
+        });
+    </script>
+</body>
+</html>

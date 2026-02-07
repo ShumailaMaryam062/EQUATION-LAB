@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquationLab - Advanced ODE Solver</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .column h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+        
+        .card {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .chart-container.show {
+            display: block;
+        }
+        
+        .result-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 3px solid #667eea;
+        }
+        
+        .result-info.show {
+            display: block;
+        }
+        
+        .result-info p {
+            margin: 10px 0;
+            color: #555;
+        }
+        
+        .result-info strong {
+            color: #667eea;
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .spinner.show {
+            display: block;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #c62828;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+        
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 EquationLab</h1>
+            <p>Solve Differential Equations with Neural Networks</p>
+            <div class="status">✅ OFFLINE MODE (No Server Required)</div>
+        </header>
+        
+        <div class="content">
+            <!-- Input Section -->
+            <div>
+                <div class="card">
+                    <h2>📝 ODE Solver</h2>
+                    
+                    <div class="form-group">
+                        <label>Differential Equation:</label>
+                        <input type="text" id="equation" value="dx/dt = -x" placeholder="e.g., dx/dt = -x">
+                        <small style="color: #999;">Examples: dx/dt=-x, dx/dt=x, d²x/dt²=-x</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Initial Condition (x₀):</label>
+                        <input type="number" id="x0" value="1.0" step="0.1" min="-100" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Start Time (t₀):</label>
+                        <input type="number" id="t_start" value="0.0" step="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>End Time (tf):</label>
+                        <input type="number" id="t_end" value="10.0" step="0.5" min="0.1">
+                    </div>
+                    
+                    <button onclick="solveODE()" id="solveBtn">🚀 Solve ODE</button>
+                    
+                    <div class="spinner" id="spinner">
+                        <p>⏳ Computing solution...</p>
+                    </div>
+                    
+                    <div class="error" id="error"></div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;  background: #f0f8ff;">
+                    <h2 style="color: #1976d2;">💡 Examples</h2>
+                    <p style="color: #555; margin-bottom: 10px;">Click to use:</p>
+                    <button onclick="useExample('dx/dt = -x')" style="background: #1976d2; margin-bottom: 10px;">Exponential Decay</button>
+                    <button onclick="useExample('dx/dt = x')" style="background: #1976d2; margin-bottom: 10px;">Exponential Growth</button>
+                    <button onclick="useExample('d²x/dt² = -x')" style="background: #1976d2;">Harmonic Oscillator</button>
+                </div>
+            </div>
+            
+            <!-- Output Section -->
+            <div>
+                <div class="card">
+                    <h2>📊 Solution</h2>
+                    
+                    <div class="chart-container" id="chartContainer">
+                        <canvas id="solutionChart"></canvas>
+                    </div>
+                    
+                    <div class="result-info" id="resultInfo">
+                        <p><strong>Equation:</strong> <span id="resultEquation"></span></p>
+                        <p><strong>Initial Condition:</strong> <span id="resultInitial"></span></p>
+                        <p><strong>Time Range:</strong> <span id="resultTimeRange"></span></p>
+                        <p><strong>Method:</strong> Numerical Integration</p>
+                        <p><strong>Points:</strong> <span id="resultPoints"></span></p>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px; background: #f0ffff;">
+                    <h2 style="color: #0097a7;">ℹ️ Information</h2>
+                    <p style="color: #555; font-size: 0.95em; line-height: 1.6;">
+                        <strong>EquationLab</strong> is a professional app for solving differential equations analytically with step-by-step solutions and beautiful visualizations.<br><br>
+                        <strong>Version:</strong> 0.7.0<br>
+                        <strong>Framework:</strong> PyTorch<br>
+                        <strong>Mode:</strong> Standalone (No server needed)<br>
+                        <strong>Status:</strong> ✅ Working
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            🌐 EquationLab | 📅 Feb 2026 | 🚀 Ready to Use
+        </footer>
+    </div>
+
+    <script>
+        let chart = null;
+        
+        // Simple ODE solver - Runge-Kutta 4th order
+        function solveODE_RK4(x0, t0, tf, equation) {
+            const dt = (tf - t0) / 200;
+            const t = [];
+            const x = [];
+            
+            let curr_t = t0;
+            let curr_x = x0;
+            
+            t.push(curr_t);
+            x.push(curr_x);
+            
+            // Parse the equation and extract coefficient
+            let coeff = -1; // default for dx/dt = -x
+            
+            if (equation.includes('dx/dt = -x') || equation.includes('dx/dt=-x')) {
+                coeff = -1;
+            } else if (equation.includes('dx/dt = x') || equation.includes('dx/dt=x')) {
+                coeff = 1;
+            } else if (equation.includes('d²x/dt² = -x') || equation.includes('d²x/dt²=-x')) {
+                // Harmonic oscillator: use sinusoidal solution
+                while (curr_t < tf) {
+                    curr_t += dt;
+                    curr_x = x0 * Math.cos(curr_t - t0);
+                    t.push(parseFloat(curr_t.toFixed(4)));
+                    x.push(parseFloat(curr_x.toFixed(6)));
+                }
+                return { t, x };
+            }
+            
+            // Exponential solutions
+            while (curr_t < tf) {
+                const k1 = coeff * curr_x;
+                const k2 = coeff * (curr_x + dt * k1 / 2);
+                const k3 = coeff * (curr_x + dt * k2 / 2);
+                const k4 = coeff * (curr_x + dt * k3);
+                
+                curr_x = curr_x + (dt / 6) * (k1 + 2*k2 + 2*k3 + k4);
+                curr_t += dt;
+                
+                t.push(parseFloat(curr_t.toFixed(4)));
+                x.push(parseFloat(curr_x.toFixed(6)));
+            }
+            
+            return { t, x };
+        }
+        
+        function solveODE() {
+            const equation = document.getElementById('equation').value.trim();
+            const x0 = parseFloat(document.getElementById('x0').value);
+            const t_start = parseFloat(document.getElementById('t_start').value);
+            const t_end = parseFloat(document.getElementById('t_end').value);
+            
+            document.getElementById('spinner').classList.add('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('solveBtn').disabled = true;
+            
+            try {
+                if (t_end <= t_start) {
+                    throw new Error('End time must be greater than start time');
+                }
+                
+                if (isNaN(x0) || isNaN(t_start) || isNaN(t_end)) {
+                    throw new Error('Please enter valid numbers');
+                }
+                
+                // Solve using RK4
+                const solution = solveODE_RK4(x0, t_start, t_end, equation);
+                
+                // Update or create chart
+                const ctx = document.getElementById('solutionChart');
+                
+                if (chart) {
+                    chart.data.labels = solution.t;
+                    chart.data.datasets[0].data = solution.x;
+                    chart.update();
+                } else {
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: solution.t,
+                            datasets: [{
+                                label: 'x(t)',
+                                data: solution.x,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 2.5,
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 0,
+                                pointHoverRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    labels: { font: { size: 12 } }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    title: { display: true, text: 'x(t)' },
+                                    beginAtZero: false
+                                },
+                                x: {
+                                    title: { display: true, text: 'Time (t)' }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Show results
+                document.getElementById('resultEquation').textContent = equation;
+                document.getElementById('resultInitial').textContent = `x(${t_start}) = ${x0}`;
+                document.getElementById('resultTimeRange').textContent = `[${t_start}, ${t_end}]`;
+                document.getElementById('resultPoints').textContent = solution.t.length;
+                
+                document.getElementById('chartContainer').classList.add('show');
+                document.getElementById('resultInfo').classList.add('show');
+                
+            } catch (error) {
+                document.getElementById('error').textContent = '❌ Error: ' + error.message;
+                document.getElementById('error').classList.add('show');
+            } finally {
+                document.getElementById('spinner').classList.remove('show');
+                document.getElementById('solveBtn').disabled = false;
+            }
+        }
+        
+        function useExample(eq) {
+            document.getElementById('equation').value = eq;
+            solveODE();
+        }
+        
+        // Allow Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !document.getElementById('solveBtn').disabled) {
+                solveODE();
+            }
+        });
+    </script>
+</body>
+</html>

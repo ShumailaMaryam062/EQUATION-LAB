@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquationLab - Frontend</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .main {
+            background: white;
+            padding: 30px;
+            margin-top: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .chart-container.show {
+            display: block;
+        }
+        
+        .result-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .result-info.show {
+            display: block;
+        }
+        
+        .result-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+        
+        .result-info strong {
+            color: #667eea;
+        }
+        
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #c33;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .info-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 EquationLab</h1>
+            <p>Solve Differential Equations with Neural Networks</p>
+        </header>
+        
+        <div class="main">
+            <!-- Input Section -->
+            <div>
+                <div class="card">
+                    <h2>📝 Solver Setup</h2>
+                    
+                    <div class="form-group">
+                        <label>Differential Equation:</label>
+                        <input type="text" id="equation" value="dx/dt = -x" placeholder="e.g., dx/dt = -x">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Initial Condition (x₀):</label>
+                        <input type="number" id="x0" value="1.0" step="0.1" placeholder="Initial value">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Start Time (t₀):</label>
+                        <input type="number" id="t_start" value="0.0" step="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>End Time (tf):</label>
+                        <input type="number" id="t_end" value="10.0" step="0.1">
+                    </div>
+                    
+                    <button onclick="solve()">🚀 Solve ODE</button>
+                    
+                    <div class="loading" id="loading">⏳ Computing solution...</div>
+                    <div class="error" id="error"></div>
+                </div>
+                
+                <div class="info-grid" style="margin-top: 20px;">
+                    <div class="info-item">
+                        <strong>📊 Examples:</strong>
+                        dx/dt = -x<br>
+                        dx/dt = x (or x2)<br>
+                        dx/dt = -2x<br>
+                        dx/dt = x^2<br>
+                        dx/dt = sin(x)
+                    </div>
+                    <div class="info-item">
+                        <strong>✨ Supported:</strong>
+                        +, -, *, /, ^<br>
+                        sin, cos, tan, sqrt<br>
+                        exp, log, abs<br>
+                        Implicit: x2 = x*2
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Output Section -->
+            <div>
+                <div class="card">
+                    <h2>📊 Solution</h2>
+                    
+                    <div class="chart-container" id="chartContainer">
+                        <canvas id="solutionChart"></canvas>
+                    </div>
+                    
+                    <div class="result-info" id="resultInfo">
+                        <p><strong>Equation:</strong> <span id="resultEquation"></span></p>
+                        <p><strong>Initial Condition:</strong> <span id="resultInitial"></span></p>
+                        <p><strong>Time Range:</strong> <span id="resultTimeRange"></span></p>
+                        <p><strong>Method:</strong> <span id="resultMethod">Analytical/Numerical Solver</span></p>
+                    </div>
+                    
+                    <div id="formulaDiv" style="display: none; margin-top: 15px; padding: 15px; background: #e8f4f8; border-left: 4px solid #667eea; border-radius: 5px;"></div>
+                    
+                    <div id="stepsDiv" style="display: none; margin-top: 15px; padding: 15px; background: #fff9e6; border-left: 4px solid #ffa500; border-radius: 5px;"></div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h2>ℹ️ About</h2>
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Diff equation Solver</strong> is a Python library for solving differential equations using neural networks based on PyTorch.
+                    </p>
+                    <p style="color: #666; font-size: 0.9em;">
+                        Version: <strong>0.7.0</strong><br>
+                        Framework: <strong>PyTorch</strong><br>
+                        Status: <span style="color: #3c3;">✅ Running</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🌐 Diff equation Solver Frontend | 🔧 Python 3.9+ | 📚 <a href="https://github.com/NeuroDiffGym/neurodiffeq" target="_blank" style="color: white;">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        let chart = null;
+        
+        // Analytical ODE solvers
+        const analyticalSolvers = {
+            // Linear homogeneous: dx/dt = kx
+            linearHomogeneous: (rhs, x0, t_start, t_end) => {
+                const match = rhs.match(/^([\+\-]?\s*[\d\.]*)\s*\*?\s*x$/i);
+                if (!match) return null;
+                
+                const k = parseFloat(match[1].replace(/\s/g, '')) || 1;
+                const formula = `x(t) = ${x0} × e^(${k}×(t-${t_start}))`;
+                const steps = [
+                    `ODE: dx/dt = ${k}x`,
+                    `This is a linear homogeneous ODE`,
+                    `Separating variables: dx/x = ${k}dt`,
+                    `Integrating: ln(x) = ${k}t + C`,
+                    `General solution: x(t) = A×e^(${k}t)`,
+                    `Using initial condition x(${t_start}) = ${x0}:`,
+                    `A = ${x0}`,
+                    `Final answer: x(t) = ${x0}×e^(${k}×(t-${t_start}))`
+                ];
+                
+                const tArray = [];
+                const xArray = [];
+                const points = 500;
+                
+                for (let i = 0; i <= points; i++) {
+                    const t = t_start + (i / points) * (t_end - t_start);
+                    const x = x0 * Math.exp(k * (t - t_start));
+                    tArray.push(parseFloat(t.toFixed(3)));
+                    xArray.push(parseFloat(x.toFixed(6)));
+                }
+                
+                return { tArray, xArray, formula, steps, methodType: 'Analytical (Linear)' };
+            },
+            
+            // Linear with constant: dx/dt = kx + b
+            linearWithConstant: (rhs, x0, t_start, t_end) => {
+                const match = rhs.match(/^([\+\-]?\s*[\d\.]*)\s*\*?\s*x\s*([\+\-]\s*[\d\.]+)$/i);
+                if (!match) return null;
+                
+                const k = parseFloat(match[1].replace(/\s/g, '')) || 1;
+                const b = parseFloat(match[2].replace(/\s/g, ''));
+                const equilibrium = -b / k;
+                
+                const formula = `x(t) = ${equilibrium} + (${x0} - ${equilibrium})×e^(${k}×(t-${t_start}))`;
+                const steps = [
+                    `ODE: dx/dt = ${k}x + ${b}`,
+                    `Equilibrium point: x* = -${b}/${k} = ${equilibrium}`,
+                    `Let y = x - ${equilibrium}`,
+                    `Then dy/dt = ${k}y (homogeneous)`,
+                    `Solution: y(t) = (${x0} - ${equilibrium})×e^(${k}t)`,
+                    `Therefore: x(t) = ${equilibrium} + (${x0} - ${equilibrium})×e^(${k}×(t-${t_start}))`
+                ];
+                
+                const tArray = [];
+                const xArray = [];
+                const points = 500;
+                
+                for (let i = 0; i <= points; i++) {
+                    const t = t_start + (i / points) * (t_end - t_start);
+                    const x = equilibrium + (x0 - equilibrium) * Math.exp(k * (t - t_start));
+                    tArray.push(parseFloat(t.toFixed(3)));
+                    xArray.push(parseFloat(x.toFixed(6)));
+                }
+                
+                return { tArray, xArray, formula, steps, methodType: 'Analytical (Linear)' };
+            }
+        };
+        
+        function solveODEAnalytical(equation, x0, t_start, t_end) {
+            const match = equation.match(/dx\/dt\s*=\s*(.+)/i);
+            if (!match) throw new Error('Invalid format. Use: dx/dt = expression');
+            
+            const rhs = match[1].trim();
+            
+            // Try analytical solvers
+            for (let [name, solver] of Object.entries(analyticalSolvers)) {
+                const result = solver(rhs, x0, t_start, t_end);
+                if (result) return result;
+            }
+            
+            // Fallback to numerical (RK4)
+            return solveODENumerical(rhs, x0, t_start, t_end);
+        }
+        
+        function evaluateExpression(exprString, x, t) {
+            try {
+                let expr = exprString;
+                
+                // Handle implicit multiplication
+                expr = expr.replace(/([xt])(\d)/g, '$1*$2');
+                expr = expr.replace(/(\d)([xt])/g, '$1*$2');
+                expr = expr.replace(/\)([xt])/g, ')*$1');
+                expr = expr.replace(/([xt])\(/g, '$1*(');
+                expr = expr.replace(/\)(\d)/g, ')*$1');
+                expr = expr.replace(/(\d)\(/g, '$1*(');
+                
+                // Replace functions
+                expr = expr
+                    .replace(/\^/g, '**')
+                    .replace(/sin/g, 'Math.sin')
+                    .replace(/cos/g, 'Math.cos')
+                    .replace(/tan/g, 'Math.tan')
+                    .replace(/exp/g, 'Math.exp')
+                    .replace(/sqrt/g, 'Math.sqrt')
+                    .replace(/abs/g, 'Math.abs')
+                    .replace(/log/g, 'Math.log')
+                    .replace(/pi/g, Math.PI)
+                    .replace(/e(?![xp])/g, Math.E);
+                
+                const func = new Function('x', 't', 'return (' + expr + ')');
+                const result = func(x, t);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    throw new Error('Invalid result');
+                }
+                
+                return result;
+            } catch (e) {
+                throw new Error('Invalid equation');
+            }
+        }
+        
+        function solveODENumerical(rhs, x0, t_start, t_end) {
+            const steps = 500;
+            const dt = (t_end - t_start) / steps;
+            const tArray = [];
+            const xArray = [];
+            
+            let t = t_start;
+            let x = x0;
+            
+            const stepsLog = [
+                `ODE: dx/dt = ${rhs}`,
+                `Method: Runge-Kutta 4th Order (Numerical)`,
+                `Initial Condition: x(${t_start}) = ${x0}`,
+                `Step size: Δt = ${dt.toFixed(6)}`
+            ];
+            
+            for (let i = 0; i <= steps; i++) {
+                tArray.push(parseFloat(t.toFixed(3)));
+                xArray.push(parseFloat(x.toFixed(6)));
+                
+                const k1 = evaluateExpression(rhs, x, t);
+                const k2 = evaluateExpression(rhs, x + 0.5*k1*dt, t + 0.5*dt);
+                const k3 = evaluateExpression(rhs, x + 0.5*k2*dt, t + 0.5*dt);
+                const k4 = evaluateExpression(rhs, x + k3*dt, t + dt);
+                
+                x = x + (dt/6.0) * (k1 + 2*k2 + 2*k3 + k4);
+                t = t + dt;
+                
+                if (!isFinite(x)) {
+                    throw new Error('Solution diverged');
+                }
+            }
+            
+            return { 
+                tArray, 
+                xArray, 
+                formula: `Numerical solution (non-linear ODE)`,
+                steps: stepsLog,
+                methodType: 'Numerical (RK4)'
+            };
+        }
+
+        function solve() {
+            const equation = document.getElementById('equation').value.trim();
+            const x0 = parseFloat(document.getElementById('x0').value);
+            const t_start = parseFloat(document.getElementById('t_start').value);
+            const t_end = parseFloat(document.getElementById('t_end').value);
+            
+            if (isNaN(x0) || isNaN(t_start) || isNaN(t_end)) {
+                document.getElementById('error').textContent = '❌ Error: Invalid input values';
+                document.getElementById('error').classList.add('show');
+                return;
+            }
+            
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('error').classList.remove('show');
+            
+            setTimeout(() => {
+                try {
+                    const result = solveODEAnalytical(equation, x0, t_start, t_end);
+                    const { tArray, xArray, formula, steps, methodType } = result;
+                    
+                    // Update chart
+                    if (chart) {
+                        chart.data.labels = tArray;
+                        chart.data.datasets[0].data = xArray;
+                        chart.update();
+                    } else {
+                        const canvasElement = document.getElementById('solutionChart');
+                        chart = new Chart(canvasElement, {
+                            type: 'line',
+                            data: {
+                                labels: tArray,
+                                datasets: [{
+                                    label: 'x(t)',
+                                    data: xArray,
+                                    borderColor: '#667eea',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    borderWidth: 2.5,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            font: { size: 12 }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        title: { display: true, text: 'x(t)' }
+                                    },
+                                    x: {
+                                        title: { display: true, text: 't' }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Show results
+                    document.getElementById('resultEquation').textContent = equation;
+                    document.getElementById('resultInitial').textContent = `x(${t_start}) = ${x0}`;
+                    document.getElementById('resultTimeRange').textContent = `[${t_start}, ${t_end}]`;
+                    document.getElementById('resultMethod').textContent = methodType;
+                    
+                    // Display formula
+                    const formulaDiv = document.getElementById('formulaDiv');
+                    if (formulaDiv) {
+                        formulaDiv.innerHTML = `<strong>📐 Solution Formula:</strong><br><code style="font-size: 14px; color: #667eea;">${formula}</code>`;
+                        formulaDiv.style.display = 'block';
+                    }
+                    
+                    // Display solving steps
+                    const stepsDiv = document.getElementById('stepsDiv');
+                    if (stepsDiv && steps && steps.length > 0) {
+                        let stepsHTML = '<strong>📋 Solution Steps:</strong><br>';
+                        steps.forEach((step, index) => {
+                            stepsHTML += `<div style="margin: 5px 0; padding: 5px; background: #f5f5f5; border-left: 3px solid #667eea;">${step}</div>`;
+                        });
+                        stepsDiv.innerHTML = stepsHTML;
+                        stepsDiv.style.display = 'block';
+                    }
+                    
+                    document.getElementById('chartContainer').classList.add('show');
+                    document.getElementById('resultInfo').classList.add('show');
+                    
+                } catch (e) {
+                    document.getElementById('error').textContent = '❌ Error: ' + e.message;
+                    document.getElementById('error').classList.add('show');
+                }
+                
+                document.getElementById('loading').classList.remove('show');
+            }, 500);
+        }
+        
+        // Allow Enter key to solve
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') solve();
+        });
+    </script>
+</body>
+</html>

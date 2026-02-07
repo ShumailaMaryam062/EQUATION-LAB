@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquationLab - Differential Equation Solver</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 i {
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .result-info p {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .result-info strong {
+            color: #667eea;
+        }
+
+        .info-card {
+            grid-column: 1 / -1;
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .feature i {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-top: 3px;
+        }
+
+        .feature p {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3c3;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-brain"></i> EquationLab</h1>
+            <p>Solve Differential Equations with Neural Networks</p>
+        </header>
+
+        <div class="main-content">
+            <!-- ODE Solver Card -->
+            <div class="card">
+                <h2><i class="fas fa-graph"></i> ODE Solver</h2>
+                
+                <form id="odeForm">
+                    <div class="form-group">
+                        <label for="equation">Equation:</label>
+                        <input type="text" id="equation" name="equation" value="dx/dt = -x" placeholder="e.g., dx/dt = -x">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="x0">Initial Condition (x₀):</label>
+                        <input type="number" id="x0" name="x0" value="1.0" step="0.1" placeholder="Initial value">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="t_start">Start Time:</label>
+                        <input type="number" id="t_start" name="t_start" value="0.0" step="0.1" placeholder="Start time">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="t_end">End Time:</label>
+                        <input type="number" id="t_end" name="t_end" value="10.0" step="0.1" placeholder="End time">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-play"></i> Solve
+                        </button>
+                        <button type="reset" class="btn-secondary">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading" id="odeLoading">
+                    <div class="spinner"></div>
+                    <p>Solving differential equation...</p>
+                </div>
+
+                <div class="results" id="odeResults">
+                    <img class="result-image" id="odeImage" src="" alt="Solution plot">
+                    <div class="result-info">
+                        <p><strong>Equation:</strong> <span id="resultEquation"></span></p>
+                        <p><strong>Initial Condition:</strong> <span id="resultIC"></span></p>
+                        <p><strong>Time Range:</strong> <span id="resultTime"></span></p>
+                    </div>
+                </div>
+
+                <div id="odeError"></div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card info-card">
+                <h3><i class="fas fa-info-circle"></i> About EquationLab</h3>
+                <p style="margin-bottom: 20px; color: #666;">
+                    A Python package for solving differential equations using artificial neural networks based on PyTorch.
+                </p>
+                
+                <h4 style="color: #667eea; margin-bottom: 15px;">Key Features:</h4>
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <p><strong>ODE Solver</strong> - First-order and higher-order ODEs</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <p><strong>PDE Solver</strong> - Cartesian & spherical coordinates</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <p><strong>Continuous Solutions</strong> - Differentiable everywhere</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check"></i>
+                        <p><strong>PyTorch Backend</strong> - GPU acceleration support</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="color: #666; font-size: 0.9em;">
+                        <i class="fas fa-github"></i> 
+                        <a href="https://github.com/NeuroDiffGym/neurodiffeq" target="_blank" style="color: #667eea; text-decoration: none;">
+                            View on GitHub
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <div class="card">
+                <h2><i class="fas fa-book"></i> Quick Reference</h2>
+                
+                <div style="color: #555; line-height: 1.8;">
+                    <p><strong style="color: #667eea;">Common ODEs:</strong></p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li><code>dx/dt = -x</code> - Exponential decay</li>
+                        <li><code>dx/dt = x</code> - Exponential growth</li>
+                        <li><code>d²x/dt² = -x</code> - Harmonic oscillator</li>
+                    </ul>
+
+                    <p><strong style="color: #667eea;">Parameters:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Equation:</strong> The differential equation to solve</li>
+                        <li><strong>Initial Condition:</strong> Value at t=0</li>
+                        <li><strong>Time Range:</strong> Integration interval</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="card">
+                <h2><i class="fas fa-plug"></i> System Status</h2>
+                <div class="result-info">
+                    <p><i class="fas fa-check" style="color: #3c3;"></i> <strong>Backend:</strong> Online</p>
+                    <p><i class="fas fa-check" style="color: #3c3;"></i> <strong>PyTorch:</strong> Available</p>
+                    <p><i class="fas fa-check" style="color: #3c3;"></i> <strong>Solvers:</strong> ODE, PDE</p>
+                    <p><i class="fas fa-check" style="color: #3c3;"></i> <strong>Version:</strong> 0.7.0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle ODE form submission
+        document.getElementById('odeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                equation: document.getElementById('equation').value,
+                x0: document.getElementById('x0').value,
+                t_start: document.getElementById('t_start').value,
+                t_end: document.getElementById('t_end').value
+            };
+
+            // Show loading, hide results and errors
+            document.getElementById('odeLoading').classList.add('show');
+            document.getElementById('odeResults').classList.remove('show');
+            document.getElementById('odeError').innerHTML = '';
+
+            try {
+                const response = await fetch('/api/solve-ode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Display results
+                    document.getElementById('odeImage').src = `data:image/png;base64,${data.plot}`;
+                    document.getElementById('resultEquation').textContent = data.equation;
+                    document.getElementById('resultIC').textContent = data.initial_condition;
+                    document.getElementById('resultTime').textContent = data.time_range;
+                    
+                    document.getElementById('odeResults').classList.add('show');
+                } else {
+                    document.getElementById('odeError').innerHTML = `
+                        <div class="error">
+                            <strong>Error:</strong> ${data.error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('odeError').innerHTML = `
+                    <div class="error">
+                        <strong>Connection Error:</strong> ${error.message}
+                    </div>
+                `;
+            } finally {
+                document.getElementById('odeLoading').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
