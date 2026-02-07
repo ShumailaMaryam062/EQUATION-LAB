@@ -38,12 +38,6 @@
 
 As universal function approximators, artificial neural networks have been shown to have the potential to solve ordinary differential equations (ODEs) and partial differential equations (PDEs) with certain initial/boundary conditions. The aim of `neurodiffeq` is to implement these existing techniques of using ANN to solve differential equations in a way that allow the software to be flexible enough to work on a wide range of user-defined problems.
 
-<p align='center'>
-  <a href='https://youtu.be/VDLwyFD-sXQ'>
-    <img src="https://raw.githubusercontent.com/NeuroDiffGym/neurodiffeq/master/resources/watermark-cover.jpg" width="80%">
-  </a>
-</p>
-
 # Installation
 
 ## Using pip
