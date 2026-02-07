@@ -1,362 +1,406 @@
-# EquationLab
 
-[![GitHub](https://img.shields.io/badge/GitHub-ShumailaMaryam062-blue?logo=github)](https://github.com/ShumailaMaryam062)
-![Python](https://img.shields.io/badge/Python-3.7%2B-blueviolet)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+[![Downloads](https://static.pepy.tech/badge/neurodiffeq)](https://pepy.tech/project/neurodiffeq)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/eada52ca726e4919923e213b81ee6420)](https://app.codacy.com/gh/odegym/neurodiffeq?utm_source=github.com&utm_medium=referral&utm_content=odegym/neurodiffeq&utm_campaign=Badge_Grade_Settings)
+![PyPI](https://img.shields.io/pypi/v/neurodiffeq?color=blueviolet&label=PyPI&logoColor=blueviolet) ![GitHub issues](https://img.shields.io/github/issues/NeuroDiffGym/neurodiffeq?color=green) [![Build Status](https://app.travis-ci.com/NeuroDiffGym/neurodiffeq.svg?branch=master)](https://app.travis-ci.com/NeuroDiffGym/neurodiffeq) [![codecov](https://codecov.io/gh/NeuroDiffGym/neurodiffeq/branch/master/graph/badge.svg)](https://codecov.io/gh/NeuroDiffGym/neurodiffeq) [![Documentation Status](https://readthedocs.org/projects/neurodiffeq/badge/?version=latest)](https://neurodiffeq.readthedocs.io/en/latest/?badge=latest) [![DOI](https://joss.theoj.org/papers/10.21105/joss.01931/status.svg)](https://doi.org/10.21105/joss.01931)
 
----
+# Citation
+**A 2nd NeuroDiffEq paper has been published. Please make sure to cite both if you have been using features that became available after the 2020 version.**
+```
+@article{chen2020neurodiffeq,
+  title={NeuroDiffEq: A Python package for solving differential equations with neural networks},
+  author={Chen, Feiyu and Sondak, David and Protopapas, Pavlos and Mattheakis, Marios and Liu, Shuheng and Agarwal, Devansh and Di Giovanni, Marco},
+  journal={Journal of Open Source Software},
+  volume={5},
+  number={46},
+  pages={1931},
+  year={2020}
+}
 
-## 🎯 Overview
+@article{liu2025recent,
+  title={Recent Advances of NeuroDiffEq--An Open-Source Library for Physics-Informed Neural Networks},
+  author={Liu, Shuheng and Protopapas, Pavlos and Sondak, David and Chen, Feiyu},
+  journal={arXiv preprint arXiv:2502.12177},
+  year={2025}
+}
+```
 
-**EquationLab** is a next-generation, research-grade differential equation solver featuring a stunning dark-mode interface with glassmorphism design. It provides **analytical solutions** to first-order linear ordinary differential equations (ODEs) with step-by-step derivations and beautiful interactive visualizations.
+------
 
-Built with an elite, futuristic aesthetic that feels like a product from a top research university - combining PhD-level mathematical rigor with Silicon Valley-grade design.
+**🔥🔥🔥Did you know that neurodiffeq supports solution bundles and can be used to solve reverse problems? [See here](#solution-bundle-and-reverse-problems)!**
 
----
+:mortar_board: **Already familiar with neurodiffeq?** :point_down: **[Jump to FAQs](#faq).**
 
-## 🎨 Design Philosophy
+------
 
-- **Dark Mode Interface** - Deep navy, charcoal, and midnight blue gradients
-- **Glassmorphism Effects** - Frosted glass cards with subtle transparency
-- **Neon Accents** - Electric blue and violet highlights
-- **Animated Backgrounds** - Floating gradient orbs and grid patterns
-- **Sidebar Navigation** - Elegant icon-based navigation panel
-- **Micro-interactions** - Smooth hover effects and transitions
-- **JetBrains Mono** - Beautiful monospace font for mathematical expressions
+# Introduction
 
----
+`neurodiffeq` is a package for solving differential equations with neural networks. Differential equations are equations that relate some function with its derivatives. They emerge in various scientific and engineering domains. Traditionally these problems can be solved by numerical methods (e.g. finite difference, finite element). While these methods are effective and adequate, their expressibility is limited by their function representation. It would be interesting if we can compute solutions for differential equations that are continuous and differentiable.
 
-## ✨ Key Features
+As universal function approximators, artificial neural networks have been shown to have the potential to solve ordinary differential equations (ODEs) and partial differential equations (PDEs) with certain initial/boundary conditions. The aim of `neurodiffeq` is to implement these existing techniques of using ANN to solve differential equations in a way that allow the software to be flexible enough to work on a wide range of user-defined problems.
 
-- ✅ **Analytical Solutions** - Solves first-order linear ODEs with exact formulas (not approximations)
-- ✅ **Step-by-Step Derivations** - Shows complete mathematical derivation for each solution
-- ✅ **Interactive Visualizations** - Beautiful graphs using Chart.js with smooth animations
-- ✅ **Research-Grade UI** - Dark mode, glassmorphism, premium academic aesthetic
-- ✅ **Multiple Equation Types** - Supports homogeneous and non-homogeneous linear ODEs
-- ✅ **Educational Focus** - Perfect for students learning differential equations
-- ✅ **Production Ready** - 100% tested, no bugs, zero external Python dependencies
-- ✅ **Easy Installation** - Cross-platform (Windows, Mac, Linux)
+<p align='center'>
+  <a href='https://youtu.be/VDLwyFD-sXQ'>
+    <img src="https://raw.githubusercontent.com/NeuroDiffGym/neurodiffeq/master/resources/watermark-cover.jpg" width="80%">
+  </a>
+</p>
 
----
+# Installation
 
-## 📊 Supported Equations
+## Using pip
 
-### Homogeneous ODEs: `dx/dt = kx`
+Like most standard libraries, `neurodiffeq` is hosted on [PyPI](https://pypi.org/project/neurodiffeq/). To install the latest stable relesase, 
 
-Solutions of the form: **x(t) = x₀ × e^(kt)**
-
-| Equation | Solution |
-|----------|----------|
-| `dx/dt = -x` | `x(t) = x₀e^(-t)` |
-| `dx/dt = x` | `x(t) = x₀e^(t)` |
-| `dx/dt = 2x` | `x(t) = x₀e^(2t)` |
-| `dx/dt = -0.5x` | `x(t) = x₀e^(-0.5t)` |
-
-### Non-Homogeneous ODEs: `dx/dt = kx + b`
-
-Solutions including equilibrium point: **x(t) = x* + (x₀ - x*)e^(k(t-t₀))** where **x* = -b/k**
-
-| Equation | Equilibrium | Solution Type |
-|----------|-------------|---------------|
-| `dx/dt = x + 2` | x* = -2 | Approaches -∞ |
-| `dx/dt = -x + 3` | x* = 3 | Approaches 3 |
-| `dx/dt = 2x - 5` | x* = 2.5 | Approaches 2.5 |
-| `dx/dt = -2x - 3` | x* = -1.5 | Approaches -1.5 |
-
----
-
-## 🚀 Quick Start
-
-### Installation
-
-#### Option 1: Windows (Easiest)
 ```bash
-1. Extract EquationLab.zip
-2. Double-click RUN.bat
-3. Browser opens automatically
+pip install -U neurodiffeq  # '-U' means update to latest version
 ```
 
-#### Option 2: Command Line
+## Manually
+
+Alternatively, you can install the library manually to get early access to our new features. This is the recommended way for developers who want to contribute to the library.
+
 ```bash
-cd EquationLab
-python run_server.py
-# Open browser to http://localhost:5000
+git clone https://github.com/NeuroDiffGym/neurodiffeq.git
+cd neurodiffeq && pip install -r requirements
+pip install .  # To make changes to the library, use `pip install -e .`
+pytest tests/  # Run tests. Optional.
 ```
 
-#### Option 3: Mac/Linux
-```bash
-cd EquationLab
-python3 run_server.py
-# Open browser to http://localhost:5000
+# Getting Started
+
+We are happy to help you with any questions. In the meantime, you can checkout the [FAQs](#faq).
+
+To view complete tutorials and documentation of `neurodiffeq`, please check [Official Documentation](https://neurodiffeq.readthedocs.io/en/latest/). 
+
+In addition to the documentations, we have recently made a quick walkthrough [Demo Video](https://youtu.be/VDLwyFD-sXQ) with [slides](https://drive.google.com/file/d/1XTbwkZ0g7ufzD7lvMB-Cl8s5nh6jKgHk/view?usp=sharing).
+
+## Example Usages
+
+### Imports
+
+```python
+from neurodiffeq import diff
+from neurodiffeq.solvers import Solver1D, Solver2D
+from neurodiffeq.conditions import IVP, DirichletBVP2D
+from neurodiffeq.networks import FCNN, SinActv
 ```
 
-### Usage
+### ODE System Example
 
-1. Go to `http://localhost:5000`
-2. Enter your ODE in the format: `dx/dt = expression`
-3. Set initial condition (default: x₀ = 1.0)
-4. Set time range (default: 0 to 10)
-5. Click **"Solve Now"**
-6. View formula, steps, and interactive graph
+Here we solve a non-linear system of two ODEs, known as the [Lotka–Volterra](https://en.wikipedia.org/wiki/Lotka–Volterra_equations) equations. There are two unknown functions (`u` and `v`) and a single independent variable (`t`).
 
----
+```python
+def ode_system(u, v, t): 
+    return [diff(u,t)-(u-u*v), diff(v,t)-(u*v-v)]
 
-## 📚 Example Usage
+conditions = [IVP(t_0=0.0, u_0=1.5), IVP(t_0=0.0, u_0=1.0)]
+nets = [FCNN(actv=SinActv), FCNN(actv=SinActv)]
 
-### Example 1: Exponential Decay
-
-**Equation:** `dx/dt = -x` with `x(0) = 1.0`, time range `[0, 10]`
-
-**Output:**
-```
-Formula: x(t) = e^(-t)
-
-Solution Steps:
-  Step 1: Given ODE: dx/dt = -x with x(0) = 1
-  Step 2: Separate Variables: dx/x = -dt
-  Step 3: Integrate: ln|x| = -t + C
-  Step 4: Exponentiate: x(t) = A·e^(-t)
-  Step 5: Apply Initial Condition: x(0) = 1 → A = 1
-  Step 6: FINAL ANSWER: x(t) = e^(-t)
-
-Graph: Smooth exponential decay curve
+solver = Solver1D(ode_system, conditions, t_min=0.1, t_max=12.0, nets=nets)
+solver.fit(max_epochs=3000)
+solution = solver.get_solution()
 ```
 
-### Example 2: Growth with Equilibrium
+`solution` is a callable object, you can pass in numpy arrays or torch tensors to it like
 
-**Equation:** `dx/dt = -x + 3` with `x(0) = 1.0`, time range `[0, 10]`
-
-**Output:**
-```
-Formula: x(t) = 3 - 2e^(-t)
-Equilibrium: x* = 3
+```python
+u, v = solution(t, to_numpy=True)  # t can be np.ndarray or torch.Tensor
 ```
 
----
+Plotting `u` and `v` against their analytical solutions yields something like:
 
-## 🛠 Technology Stack
+![lotka–volterra-solution](resources/lotka–volterra-solution.png)
 
-### Frontend
-- **HTML5** - Modern semantic markup with accessibility
-- **CSS3** - Advanced styling with CSS variables, glassmorphism, animations
-- **JavaScript** - Vanilla ES6+ (no frameworks needed)
-- **Chart.js** - Interactive data visualization with custom dark theme
-- **Inter Font** - Modern, clean UI typography
-- **JetBrains Mono** - Beautiful monospace for code/math
-- **Font Awesome 6** - Premium icons
+### PDE System Example
 
-### Backend
-- **Python 3.7+** - Server hosting
-- **SimpleHTTPRequestHandler** - Lightweight HTTP server
-- **No external dependencies** - Uses only Python standard library
+Here we solve a Laplace Equation with Dirichlet boundary conditions on a rectangle. Note that we choose Laplace equation for its simplicity of computing analytical solution. **In practice, you can attempt any nonlinear, chaotic PDEs**, provided you tune the solver well enough.
 
-### Design System
-- **Theme:** Dark mode with glassmorphism effects
-- **Primary Colors:** Electric indigo (#6366f1), Violet (#8b5cf6)
-- **Accent Colors:** Cyan (#06b6d4), Pink (#ec4899)
-- **Background:** Deep navy (#0a0e17) with gradient orbs
-- **Cards:** Frosted glass with backdrop-filter blur
-- **Animations:** Floating backgrounds, hover transitions, smooth scrolling
-- **Layout:** Sidebar navigation + responsive grid
+Solving a 2-D PDE system is quite similar to solving ODEs, except there are *two* variables `x` and `y` for boundary value problems or `x` and `t` for initial boundary value problems, both of which are supported.
 
----
+```python
+def pde_system(u, x, y):
+    return [diff(u, x, order=2) + diff(u, y, order=2)]
 
-## 📂 Project Structure
+conditions = [
+    DirichletBVP2D(
+        x_min=0, x_min_val=lambda y: torch.sin(np.pi*y),
+        x_max=1, x_max_val=lambda y: 0,                   
+        y_min=0, y_min_val=lambda x: 0,                   
+        y_max=1, y_max_val=lambda x: 0,                   
+    )
+]
+nets = [FCNN(n_input_units=2, n_output_units=1, hidden_units=(512,))]
 
-```
-EquationLab/
-├── www/
-│   ├── index.html           # Main web application
-│   └── index_old.html       # Alternative version
-├── templates/
-│   └── index.html           # Template version
-├── README_SETUP.md          # Detailed setup guide
-├── PROJECT_DETAILS.txt      # Complete project documentation
-├── EMAIL_TO_PROFESSOR.txt   # Email template for submission
-├── run_server.py            # Python server
-├── app.py                   # Flask application
-├── RUN.bat                  # Windows launcher
-├── OPEN.bat                 # Offline launcher
-└── requirements.txt         # Python dependencies
+solver = Solver2D(pde_system, conditions, xy_min=(0, 0), xy_max=(1, 1), nets=nets)
+solver.fit(max_epochs=2000)
+solution = solver.get_solution()
 ```
 
----
+The signature of `solution` for a 2D PDE is slightly different from that of an ODE. Again, it takes in either numpy arrays or torch tensors.
 
-## 🧪 Test Results
-
-**Comprehensive Testing: 11/11 PASSED ✅**
-
-All equation types tested and verified:
-- ✅ Homogeneous equations (5 types)
-- ✅ Non-homogeneous equations (6 types)
-- ✅ Positive, negative, and decimal coefficients
-- ✅ Mathematical accuracy verified
-
----
-
-## 💻 System Requirements
-
-- **Python:** 3.7 or higher
-- **Browser:** Chrome, Firefox, Edge, Safari (modern versions)
-- **OS:** Windows 7+, macOS 10.12+, Linux (any distro)
-- **Disk Space:** ~5 MB
-- **RAM:** 256 MB minimum
-- **Network:** No internet required (localhost only)
-
----
-
-## 🎓 Mathematical Foundation
-
-### Method: Variable Separation
-
-EquationLab uses the **method of variable separation** to solve differential equations.
-
-#### For Homogeneous ODEs (dx/dt = kx):
+```python
+u = solution(x, y, to_numpy=True)
 ```
-1. Separate variables:     dx/x = k dt
-2. Integrate both sides:   ∫(1/x)dx = ∫k dt
-3. Evaluate integrals:     ln|x| = kt + C
-4. Solve for x:            x = Ae^(kt)
-5. Apply initial condition: x(t₀) = x₀ → A = x₀e^(-kt₀)
-6. Final form:             x(t) = x₀e^(k(t-t₀))
+Evaluating u on `[0,1] × [0,1]` yields the following plots
+
+|                 ANN-Based Solution                  |                    Residual of PDE                           |
+| :-------------------------------------------------: | :----------------------------------------------------------: |
+| ![laplace-solution](resources/laplace-solution.png) | ![laplace-error](resources/laplace-error.png)                |
+
+### Using a Monitor
+
+A monitor is a tool for visualizing PDE/ODE solutions as well as history of loss and custom metrics during training. Jupyter Notebooks users need to run the `%matplotlib notebook` magic. For Jupyter Lab users, try `%matplotlib widget`. 
+
+```python
+from neurodiffeq.monitors import Monitor1D
+...
+monitor = Monitor1D(t_min=0.0, t_max=12.0, check_every=100)
+solver.fit(..., callbacks=[monitor.to_callback()])
 ```
 
-#### For Non-Homogeneous ODEs (dx/dt = kx + b):
-```
-1. Find equilibrium:       x* = -b/k (where dx/dt = 0)
-2. Transform to homogeneous: Let y = x - x*
-3. Solve homogeneous part: dy/dt = ky → y(t) = Ce^(kt)
-4. Apply initial condition: C = x₀ - x*
-5. Back-substitute:        x(t) = x* + (x₀ - x*)e^(k(t-t₀))
-```
+You should see the plots update *every 100 epoch* as well as *on the last epoch*, showing two plots — one for solution visualization on the interval `[0,12]` and the other for loss history (training and validation). 
 
----
+![monitor](resources/monitor.gif)
 
-## 🎨 User Interface Highlights
+### Custom Networks
 
-### Professional Design
-- **Header:** Sticky navigation with EquationLab branding
-- **Hero Section:** Clear headline and value proposition
-- **Input Card:** Clean form with helpful hints
-- **Results Card:** Formula display with color coding
-- **Steps Card:** Numbered, highlighted solution derivation
-- **Graph Card:** Interactive, responsive visualization
-- **Footer:** Professional attribution
+For convenience, we have implemented an `FCNN` – fully-connected neural network, whose hidden units and activation functions can be customized. 
 
-### User Experience
-- **Real-time Validation:** Immediate feedback on input
-- **Error Messages:** Clear, actionable error descriptions
-- **Success Messages:** Confirmation when solution is computed
-- **Responsive Design:** Perfect on mobile, tablet, desktop
-- **Smooth Animations:** Polished, professional transitions
-
----
-
-## 📊 Performance
-
-- **Page Load:** < 1 second
-- **Solution Computation:** < 100ms
-- **Graph Rendering:** < 200ms
-- **Total Response Time:** < 300ms
-- **Data Points:** 500 points per graph for smoothness
-- **Browser Support:** All modern browsers
-
----
-
-## 🔧 Configuration
-
-### Server Port
-Edit `run_server.py` to change port (default: 5000)
-
-### Time Domain
-Edit input fields to change default time range
-
-### Initial Condition
-Default is x₀ = 1.0 (customizable in UI)
-
----
-
-## 🐛 Troubleshooting
-
-### "Port 5000 already in use"
-```bash
-# Windows: Kill existing process
-Get-Process python | Stop-Process -Force
-
-# Mac/Linux: Find and kill process
-lsof -ti:5000 | xargs kill -9
+```python
+from neurodiffeq.networks import FCNN
+# Default: n_input_units=1, n_output_units=1, hidden_units=[32, 32], activation=torch.nn.Tanh
+net1 = FCNN(n_input_units=..., n_output_units=..., hidden_units=[..., ..., ...], activation=...) 
+...
+nets = [net1, net2, ...]
 ```
 
-### "Browser won't open automatically"
-Manually navigate to `http://localhost:5000`
+`FCNN` is usually a good starting point. For advanced users, solvers are compatible with any custom `torch.nn.Module`. The only constraints are:
 
-### "Module not found errors"
-```bash
-pip install -r requirements.txt
+1. The modules takes in a tensor of shape `(None, n_coords)` and the outputs a tensor of shape `(None, 1)`. 
+
+2. There must be a total of `n_funcs` modules in `nets` to be passed to `solver = Solver(..., nets=nets)`.
+
+![monitor](resources/nets.png)
+
+*Acutally, `neurodiffeq` has a **single_net** feature that doesn't obey the above rules, which won't be covered here.*
+
+Read the PyTorch [tutorial](https://pytorch.org/docs/stable/notes/modules.html) on building your own network (a.k.a module) architecture. 
+
+### Transfer Learning
+
+Transfer learning is easily done by serializing `old_solver.nets` (a list of torch modules) to disk and then loading them and passing to a new solver:
+
+```python
+old_solver.fit(max_epochs=...)
+# ... dump `old_solver.nets` to disk
+
+# ... load the networks from disk, store them in some `loaded_nets` variable
+new_solver = Solver(..., nets=loaded_nets)
+new_solver.fit(max_epochs=...)
 ```
 
-### "Permission denied on RUN.bat"
-Right-click → Properties → Check "Run as administrator"
+We currently working on wrapper functions to save/load networks and other internal variables of Solvers. In the meantime, you can read the PyTorch [tutorial](https://pytorch.org/tutorials/beginner/saving_loading_models.html) on saving and loading your networks.
 
----
+### Sampling Strategies
 
-## ✅ Validation Checklist
+In neurodiffeq, the networks are trained by minimizing loss (ODE/PDE residuals) evaluated on a set of points in the domain. The points are randonly resampled every time. To control the number, distribution, and bounding domain of sampled points, you can specify your own training/valiadation `generator`s.
 
-- ✅ Mathematical accuracy verified (11 test cases)
-- ✅ All equation types working correctly
-- ✅ UI tested on multiple browsers
-- ✅ Responsive design verified on mobile/tablet/desktop
-- ✅ Error handling implemented
-- ✅ Performance optimized
-- ✅ Code commented and documented
-- ✅ Production-ready code
+```python
+from neurodiffeq.generators import Generator1D
 
----
+# Default t_min=0.0, t_max=1.0, method='uniform', noise_std=None
+g1 = Generator1D(size=..., t_min=..., t_max=..., method=..., noise_std=...)
+g2 = Generator1D(size=..., t_min=..., t_max=..., method=..., noise_std=...)
 
-## 📖 Learn More
+solver = Solver1D(..., train_generator=g1, valid_generator=g2)
+```
 
-For detailed information about setup, usage, and features, see:
-- **[README_SETUP.md](README_SETUP.md)** - Complete setup and usage guide
-- **[PROJECT_DETAILS.txt](PROJECT_DETAILS.txt)** - Comprehensive project documentation
-- **[EMAIL_TO_PROFESSOR.txt](EMAIL_TO_PROFESSOR.txt)** - Professional submission template
+Here are  some sample distributions of a `Generator1D`.
 
----
+|      `Generator1D(8192, 0.0, 1.0, method='uniform')`      | `Generator1D(8192, -1.0, 0.0, method='log-spaced-noisy', noise_std=1e-3)` |
+| :-------------------------------------------------------: | :----------------------------------------------------------: |
+| ![generator1d-uniform](resources/generator1d-uniform.jpg) | ![generator1d-log-spaced-noisy](resources/generator1d-log-spaced-noisy.jpg) |
 
-## 👤 Author
 
-**Shumaila Maryam**
 
-Connect on GitHub: [@ShumailaMaryam062](https://github.com/ShumailaMaryam062)
+Note that when both `train_generator` and `valid_generator` are specified, `t_min` and `t_max` can be omitted in `Solver1D(...)`. In fact, even if you pass `t_min`, `t_max`, `train_generator`, `valid_generator` together, the `t_min` and `t_max` will still be ignored.
 
----
+#### Combining Generators
 
-## 📄 License
+Another nice feature of the generators is that you can concatenate them, for example 
 
-MIT License - See LICENSE file for details
+```python
+g1 = Generator2D((16, 16), xy_min=(0, 0), xy_max=(1, 1))
+g2 = Generator2D((16, 16), xy_min=(1, 1), xy_max=(2, 2))
+g = g1 + g2
+```
 
----
+Here, `g` will be a generator that outputs the combined samples of `g1` and `g2`
 
-## 🎯 Status
+|                     `g1`                      |                     `g2`                      |                        `g1 + g2`                        |
+| :-------------------------------------------: | :-------------------------------------------: | :-----------------------------------------------------: |
+| ![generator2d-1](resources/generator2d-1.jpg) | ![generator2d-2](resources/generator2d-2.jpg) | ![generator2d-concat](resources/generator2d-concat.jpg) |
 
-**✅ PRODUCTION READY** - Fully tested, documented, and ready for immediate use
+#### Sampling Higher Dimensions
 
-**Version:** 1.0 Professional  
-**Last Updated:** February 7, 2026  
-**Test Pass Rate:** 11/11 (100%)
+You can use `Generator2D`, `Generator3D`, etc. for sampling points in higher dimensions. But there's also another way
 
----
+```python
+g1 = Generator1D(1024, 2.0, 3.0, method='uniform')
+g2 = Generator1D(1024, 0.1, 1.0, method='log-spaced-noisy', noise_std=0.001)
+g = g1 * g2
+```
 
-## 🙏 Acknowledgments
+Here, `g` will be a generator which yields 1024 points in a 2-D rectangle `(2,3) × (0.1,1)` every time. The x-coordinates of them are drawn from `(2,3)` using strategy `uniform` and the y-coordinate drawn from `(0.1,1)` using strategy `log-spaced-noisy`.
 
-Built with:
-- Pure HTML5 + CSS3 + JavaScript
-- Chart.js for visualization
-- Google Fonts Roboto for typography
-- Font Awesome for icons
+|                      `g1`                       |                      `g2`                       |                          `g1 * g2`                           |
+| :---------------------------------------------: | :---------------------------------------------: | :----------------------------------------------------------: |
+| ![generator2d-1](resources/generator-ens-1.jpg) | ![generator2d-2](resources/generator-ens-2.jpg) | ![generator2d-concat](resources/generator-ens-ensembled.jpg) |
 
-No external Python dependencies required - just Python 3.7+ and a modern browser!
+# Solution Bundle and Reverse Problems
 
----
+Sometimes, it is interesting to solve a ***bundle*** of equations at once. For example, you may want to solve differential equations of the form `du/dt + λu = 0` under the initial condition `u(0) = U0`. You may want to solve this for all `λ` and `U0` at once, by treating them as inputs to the neural networks. 
 
-**Made with ❤️ for learning differential equations**
+One such application is for chemical reactions, where the reaction rate is unknown. Different reaction rates correspond to different solutions, and only one solution matches observed data points. You maybe interested in first solving for a bundle of solutions, and then determining the best reaction rates (aka equation parameters). The second step is known as the ***inverse problem***. 
+
+Here's an example of how to do this using `neurodiffeq`:
+
+1. Let's say we have an equation `du/dt + λu = 0` and initial condition `u(0) = U0` where `λ` and `U0` are unknown constants. We also have a set of observations `t_obs` and `u_obs`. We first import `BundleSolver` and `BundleIVP` which is necessary to obtaining a solution bundle:
+
+   ```python
+   from neurodiffeq.conditions import BundleIVP
+   from neurodiffeq.solvers import BundleSolver1D
+   
+   import matplotlib.pyplot as plt
+   import numpy as np
+   import torch
+   from neurodiffeq import diff
+   ```
+
+2. We determine the domain of input `t`, as well as the domain of parameters  `λ` and `U0`. We also need to make a decision of the order of the parameters. Namely, which should be the first parameter, and which should be the second. **For the purpose of this demo, we choose `λ` to be the first parameter (index 0), and `U0` to be the second (index 1). It is very important to keep track of the indices of the parameters.**
+
+   ```python
+   T_MIN, T_MAX = 0, 1
+   LAMBDA_MIN, LAMBDA_MAX = 3, 5  # first parameter,  index = 0
+   U0_MIN, U0_MAX = 0.2, 0.6       # second parameter, index = 1
+   ```
+
+3. We then define the `conditions` and `solver` as usual, except that we use `BundleIVP` and `BundleSolver1D` instead of `IVP` and `Solver1D`. The interface of these two is very similar to `IVP` and `Solver1D`. You can find out more in the [API reference](https://neurodiffeq.readthedocs.io/en/latest/api.html). 
+
+   ```python
+   # equation parameters comes after inputs (usually temporal and spatial coordinates)
+   diff_eq = lambda u, t, lmd: [diff(u, t) + lmd * u]
+   
+   # The keyword argument must be named "u_0" in BundleIVP. If you use anything else, e.g. `y0`, `u0`, etc., it won't work.
+   conditions = [
+       BundleIVP(t_0=0, u_0=None, bundle_param_lookup={'u_0': 1})  # u_0 has index 1
+   ]
+   
+   solver = BundleSolver1D(
+       ode_system=diff_eq,
+       conditions=conditions,
+       t_min=T_MIN, t_max=T_MAX, 
+       theta_min=[LAMBDA_MIN, U0_MIN],  # λ has index 0; u_0 has index 1
+       theta_max=[LAMBDA_MAX, U0_MAX],  # λ has index 0; u_0 has index 1
+       eq_param_index=(0,),             # λ is the only equation parameter, which has index 0
+       n_batches_valid=1,
+   )
+   ```
+
+   Since **`λ` is a parameter in the equation** and **`U0` is a parameter in the initial condition**, we must include `λ` in the `diff_eq` and `U0` in the condition. If a parameter is present in both the equation and the condition, it must be included in both places. **All elements of `conditions` passed to `BundleSovler1D` must be `Bundle*` conditions, even if they don't have parameters.**
+
+4. Now, we can train it and obtain the solution as we normally would. 
+
+   ```python
+   solver.fit(max_epochs=1000)
+   solution = solver.get_solution(best=True)
+   ```
+
+   The solution expects three inputs - `t`, `λ` and `U0`. All inputs must have the same shape. For example, if you are interested in fixing `λ=4` and `U0=0.4` and plotting the solution `u` against `t ∈ [0,1]` , you can do the following
+
+   ```python
+   t = np.linspace(0, 1)
+   lmd = 4 * np.ones_like(t)
+   u0 = 0.4 * np.ones_like(t)
+   
+   u = solution(t, lmd, u0, to_numpy=True)
+   
+   import matplotlib.pyplot as plt
+   plt.plot(t, u)
+   ```
+
+5. Once you have a bundled `solution`, you can find a set of parameters `(λ, U0)` that matches observed data points `(t_i, u_i)` most closely. This is achieved using simple gradient descent. In the following toy example, we assume there are only three data points `u(0.2) = 0.273`, `u(0.5)=0.129`, and `u(0.8) = 0.0609`. The following is classical PyTorch workflow.
+
+   ```python
+   # observed data points
+   t_obs = torch.tensor([0.2, 0.5, 0.8]).reshape(-1, 1)
+   u_obs = torch.tensor([0.273, 0.129, 0.0609]).reshape(-1, 1)
+   
+   # random intialization of λ and U0; keep track of their gradient
+   lmd_tensor = torch.rand(1) * (LAMBDA_MAX - LAMBDA_MIN) + LAMBDA_MIN
+   u0_tensor = torch.rand(1) * (U0_MAX - U0_MIN) + U0_MIN
+   adam = torch.optim.Adam([lmd_tensor.requires_grad_(True), u0_tensor.requires_grad_(True)], lr=1e-2)
+   
+   # run gradient descent for 10000 epochs
+   for _ in range(10000):
+       output = solution(t_obs, lmd_tensor * torch.ones_like(t_obs), u0_tensor * torch.ones_like(t_obs))
+       loss = ((output - u_obs) ** 2).mean()
+       loss.backward()
+       adam.step()
+       adam.zero_grad()
+      
+   print(f"λ = {lmd_tensor.item()}, U0={u0_tensor.item()}, loss = {loss.item()}")
+   ```
+
+# FAQ
+
+#### Q: How to use GPU for training?
+
+Simple. When importing neurodiffeq, the library automatically detects if CUDA is available on your machine. Since the library is based on PyTorch, it will set default tensor type to `torch.cuda.DoubleTensor` for if a compatible GPU device is found.
+
+#### Q: How to use pretrained nets?
+
+Refer to Sections [Custom Networks](#custom-networks) and [Transfer Learning](#transfer-learning).
+
+#### Q: How to change the learning rate?
+
+The standard PyTorch way. 
+
+1. Build your networks as explained in [Custom Networks](#custom-networks): `nets = [FCNN(), FCN(), ...]`
+
+2. Instantiate a custom optimizer and pass all parameters of these networks to it
+
+   ```python
+   parameters = [p for net in nets for p in net.parameters()]  # list of paramters of all networks
+   MY_LEARNING_RATE = 5e-3
+   optimizer = torch.optim.Adam(parameters, lr=MY_LEARNING_RATE, ...)
+   ```
+
+3. Pass BOTH your `nets ` and your `optimizer` to the solver: `solver = Solver1D(..., nets=nets, optimizer=optimizer)`
+
+#### Q: I got a bad solution.
+
+Unlike traditional numerial methods (FEM, FVM, etc.), the NN-based solution requires some hypertuning. The library offers the utmost flexibility to try any combination of hyperparameters.
+
+- To use a different network architecture, you can pass in your custom `torch.nn.Module`s.
+- To use a different optimizer, you can pass in your own optimizer to `solver = Solver(..., optimizer=my_optim)`. 
+- To use a different sampling distribution, you can use [built-in generators](https://neurodiffeq.readthedocs.io/en/latest/api.html#module-neurodiffeq.generators) or write your own generators from scratch.
+- To use a different sampling size, you can tweak the generators or change `solver = Solver(..., n_batches_train)`.
+- To dynamically change hyperparameters during training, checkout our [callbacks](https://neurodiffeq.readthedocs.io/en/latest/api.html#module-neurodiffeq.callbacks) feature.
+
+#### Q: Any rules of thumbs?
+
+- Don't use `ReLU` for activation, because its second-order derivative is identically 0.
+- Re-scale your PDE/ODE in dimensionless form, preferably make everything range in `[0,1]`. Working with a domain like `[0,1000000]` is prone to failure because **a)** PyTorch initializes the modules weights to be relatively small and **b)** most activation functions (like Sigmoid, Tanh, Swish) are most nonlinear near 0.
+- If your PDE/ODE is too complicated, consider trying curriculum learning. Start training your networks on a smaller domain, and then gradually expand until the whole domain is covered.
+
+# Contributing
+
+Everyone is welcome to contribute to this project.
+
+When contributing to this repository, we consider the following process:
+
+1. Open an issue to discuss the change you are planning to make.
+2. Go through [Contribution Guidelines](CONTRIBUTING.md).
+3. Make the change on a forked repository and update the README.md if changes are made to the interface.
+4. Open a pull request. 
+
